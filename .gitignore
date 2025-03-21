@@ -1,0 +1,40 @@
+# Environment files
+.env
+*.env
+.env.*
+
+# Password files
+passwords.txt
+*_password.txt
+
+# Docker volumes
+/volumes/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+.directory
+*.swp
+*.swo
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+log/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Generated files
+n8n-docker-compose.yaml
+flowise-docker-compose.yaml
+Caddyfile 
