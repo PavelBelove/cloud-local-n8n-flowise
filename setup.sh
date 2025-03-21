@@ -47,6 +47,11 @@ main() {
     read -p "Enter your email (will be used for n8n login): " USER_EMAIL
   done
   
+  # Request timezone
+  DEFAULT_TIMEZONE=$(timedatectl show --property=Timezone --value 2>/dev/null || echo "UTC")
+  read -p "Enter your timezone (default: $DEFAULT_TIMEZONE): " GENERIC_TIMEZONE
+  GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-$DEFAULT_TIMEZONE}
+  
   # Create setup-files directory if it doesn't exist
   if [ ! -d "setup-files" ]; then
     mkdir -p setup-files
@@ -73,7 +78,7 @@ main() {
   
   # Step 4: Secret key generation
   show_progress "Step 4/7: Secret key generation"
-  ./setup-files/04-generate-secrets.sh "$USER_EMAIL" "$DOMAIN_NAME"
+  ./setup-files/04-generate-secrets.sh "$USER_EMAIL" "$DOMAIN_NAME" "$GENERIC_TIMEZONE"
   check_success "secret key generation"
   
   # Step 5: Template creation
@@ -92,6 +97,8 @@ main() {
   check_success "service launch"
   
   # Load generated passwords
+  N8N_PASSWORD=""
+  FLOWISE_PASSWORD=""
   if [ -f "./setup-files/passwords.txt" ]; then
     source ./setup-files/passwords.txt
   fi
