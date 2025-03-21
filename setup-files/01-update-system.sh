@@ -1,25 +1,36 @@
 #!/bin/bash
 
-echo "Обновление системы..."
-# Установка переменной окружения для предотвращения интерактивных запросов
+echo "Updating system..."
+# Setting environment variables to prevent interactive prompts
 export DEBIAN_FRONTEND=noninteractive
-# Опции apt для автоматического подтверждения и предотвращения запросов
+
+# Configuring debconf for automatic service restart
+echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
+sudo bash -c "cat > /etc/apt/apt.conf.d/70debconf << EOF
+Dpkg::Options {
+   \"--force-confdef\";
+   \"--force-confold\";
+}
+EOF"
+
+# apt options for automatic confirmation and preventing prompts
 APT_OPTIONS="-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y"
 
 sudo apt-get update
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось обновить список пакетов"
+  echo "ERROR: Failed to update package list"
   exit 1
 fi
 
-sudo apt-get upgrade $APT_OPTIONS
+# Adding -qq option for quieter output and option for automatic service restart
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qq upgrade $APT_OPTIONS
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось обновить пакеты"
+  echo "ERROR: Failed to upgrade packages"
   exit 1
 fi
 
 sudo apt-get autoremove $APT_OPTIONS
 sudo apt-get clean
 
-echo "✅ Система успешно обновлена"
-exit 0 
+echo "✅ System successfully updated"
+exit 0

@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Функция для проверки успешного выполнения команды
+# Function to check successful command execution
 check_success() {
   if [ $? -ne 0 ]; then
-    echo "❌ Ошибка при выполнении $1"
-    echo "Установка прервана. Пожалуйста, исправьте ошибки и попробуйте снова."
+    echo "❌ Error executing $1"
+    echo "Installation aborted. Please fix the errors and try again."
     exit 1
   fi
 }
 
-# Функция для отображения прогресса
+# Function to display progress
 show_progress() {
   echo ""
   echo "========================================================"
@@ -18,111 +18,111 @@ show_progress() {
   echo ""
 }
 
-# Главная функция установки
+# Main installation function
 main() {
-  show_progress "🚀 Начало установки n8n, Flowise и Caddy"
+  show_progress "🚀 Starting installation of n8n, Flowise, and Caddy"
   
-  # Проверяем права администратора
+  # Check administrator rights
   if [ "$EUID" -ne 0 ]; then
     if ! sudo -n true 2>/dev/null; then
-      echo "Для установки требуются права администратора"
-      echo "Пожалуйста, введите пароль администратора, когда будет запрошено"
+      echo "Administrator rights are required for installation"
+      echo "Please enter the administrator password when prompted"
     fi
   fi
   
-  # Запрос данных пользователя
-  echo "Для установки необходимо указать имя домена и email адрес."
+  # Request user data
+  echo "For installation, you need to specify a domain name and email address."
   
-  # Запрос доменного имени
-  read -p "Введите имя вашего домена (например, example.com): " DOMAIN_NAME
+  # Request domain name
+  read -p "Enter your domain name (e.g., example.com): " DOMAIN_NAME
   while [[ -z "$DOMAIN_NAME" ]]; do
-    echo "Имя домена не может быть пустым"
-    read -p "Введите имя вашего домена (например, example.com): " DOMAIN_NAME
+    echo "Domain name cannot be empty"
+    read -p "Enter your domain name (e.g., example.com): " DOMAIN_NAME
   done
   
-  # Запрос email адреса
-  read -p "Введите ваш email (будет использоваться для входа в n8n): " USER_EMAIL
+  # Request email address
+  read -p "Enter your email (will be used for n8n login): " USER_EMAIL
   while [[ ! "$USER_EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; do
-    echo "Введите корректный email адрес"
-    read -p "Введите ваш email (будет использоваться для входа в n8n): " USER_EMAIL
+    echo "Enter a valid email address"
+    read -p "Enter your email (will be used for n8n login): " USER_EMAIL
   done
   
-  # Создаем директорию setup-files, если она не существует
+  # Create setup-files directory if it doesn't exist
   if [ ! -d "setup-files" ]; then
     mkdir -p setup-files
-    check_success "создание директории setup-files"
+    check_success "creating setup-files directory"
   fi
   
-  # Устанавливаем права на выполнение для всех скриптов
+  # Set execution permissions for all scripts
   chmod +x setup-files/*.sh 2>/dev/null || true
   
-  # Шаг 1: Обновление системы
-  show_progress "Шаг 1/7: Обновление системы"
+  # Step 1: System update
+  show_progress "Step 1/7: System update"
   ./setup-files/01-update-system.sh
-  check_success "обновление системы"
+  check_success "system update"
   
-  # Шаг 2: Установка Docker
-  show_progress "Шаг 2/7: Установка Docker"
+  # Step 2: Docker installation
+  show_progress "Step 2/7: Docker installation"
   ./setup-files/02-install-docker.sh
-  check_success "установка Docker"
+  check_success "Docker installation"
   
-  # Шаг 3: Настройка директорий
-  show_progress "Шаг 3/7: Настройка директорий"
+  # Step 3: Directory setup
+  show_progress "Step 3/7: Directory setup"
   ./setup-files/03-setup-directories.sh
-  check_success "настройка директорий"
+  check_success "directory setup"
   
-  # Шаг 4: Генерация секретных ключей
-  show_progress "Шаг 4/7: Генерация секретных ключей"
+  # Step 4: Secret key generation
+  show_progress "Step 4/7: Secret key generation"
   ./setup-files/04-generate-secrets.sh "$USER_EMAIL" "$DOMAIN_NAME"
-  check_success "генерация секретных ключей"
+  check_success "secret key generation"
   
-  # Шаг 5: Создание шаблонов
-  show_progress "Шаг 5/7: Создание конфигурационных файлов"
+  # Step 5: Template creation
+  show_progress "Step 5/7: Configuration file creation"
   ./setup-files/05-create-templates.sh "$DOMAIN_NAME"
-  check_success "создание конфигурационных файлов"
+  check_success "configuration file creation"
   
-  # Шаг 6: Настройка брандмауэра
-  show_progress "Шаг 6/7: Настройка брандмауэра"
+  # Step 6: Firewall setup
+  show_progress "Step 6/7: Firewall setup"
   ./setup-files/06-setup-firewall.sh
-  check_success "настройка брандмауэра"
+  check_success "firewall setup"
   
-  # Шаг 7: Запуск сервисов
-  show_progress "Шаг 7/7: Запуск сервисов"
+  # Step 7: Service launch
+  show_progress "Step 7/7: Service launch"
   ./setup-files/07-start-services.sh
-  check_success "запуск сервисов"
+  check_success "service launch"
   
-  # Загрузка сгенерированных паролей
+  # Load generated passwords
   if [ -f "./setup-files/passwords.txt" ]; then
     source ./setup-files/passwords.txt
   fi
   
-  # Установка завершена успешно
-  show_progress "✅ Установка успешно завершена!"
+  # Installation successfully completed
+  show_progress "✅ Installation successfully completed!"
   
-  echo "n8n доступен по адресу: https://n8n.${DOMAIN_NAME}"
-  echo "Flowise доступен по адресу: https://flowise.${DOMAIN_NAME}"
+  echo "n8n is available at: https://n8n.${DOMAIN_NAME}"
+  echo "Flowise is available at: https://flowise.${DOMAIN_NAME}"
   echo ""
-  echo "Данные для входа в n8n:"
+  echo "Login credentials for n8n:"
   echo "Email: ${USER_EMAIL}"
-  echo "Пароль: ${N8N_PASSWORD:-<проверьте файл .env>}"
+  echo "Password: ${N8N_PASSWORD:-<check the .env file>}"
   echo ""
-  echo "Данные для входа в Flowise:"
-  echo "Логин: admin"
-  echo "Пароль: ${FLOWISE_PASSWORD:-<проверьте файл .env>}"
+  echo "Login credentials for Flowise:"
+  echo "Username: admin"
+  echo "Password: ${FLOWISE_PASSWORD:-<check the .env file>}"
   echo ""
-  echo "Обратите внимание, что для работы с доменным именем необходимо настроить DNS-записи,"
-  echo "указывающие на IP-адрес данного сервера."
+  echo "Please note that for the domain name to work, you need to configure DNS records"
+  echo "pointing to the IP address of this server."
   echo ""
-  echo "Для редактирования конфигурации используйте файлы:"
-  echo "- n8n-docker-compose.yaml (конфигурация n8n и Caddy)"
-  echo "- flowise-docker-compose.yaml (конфигурация Flowise)"
-  echo "- .env (переменные окружения для всех сервисов)"
-  echo "- Caddyfile (настройки обратного прокси)"
+  echo "To edit the configuration, use the following files:"
+  echo "- n8n-docker-compose.yaml (n8n and Caddy configuration)"
+  echo "- flowise-docker-compose.yaml (Flowise configuration)"
+  echo "- .env (environment variables for all services)"
+  echo "- Caddyfile (reverse proxy settings)"
   echo ""
-  echo "Чтобы перезапустить сервисы, выполните команды:"
+  echo "To restart services, execute the commands:"
   echo "docker compose -f n8n-docker-compose.yaml restart"
   echo "docker compose -f flowise-docker-compose.yaml restart"
 }
 
-# Запуск основной функции
+# Run main function
 main 

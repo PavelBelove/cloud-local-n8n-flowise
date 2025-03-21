@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Получаем переменные из основного скрипта через аргументы
+# Get variables from the main script via arguments
 DOMAIN_NAME=$1
 
 if [ -z "$DOMAIN_NAME" ]; then
-  echo "ОШИБКА: Не указано имя домена"
-  echo "Использование: $0 example.com"
+  echo "ERROR: Domain name not specified"
+  echo "Usage: $0 example.com"
   exit 1
 fi
 
-echo "Создание шаблонов и конфигурационных файлов..."
+echo "Creating templates and configuration files..."
 
-# Проверка наличия файлов шаблонов и создание их
+# Check for template files and create them
 if [ ! -f "n8n-docker-compose.yaml.template" ]; then
-  echo "Создание шаблона n8n-docker-compose.yaml.template..."
+  echo "Creating template n8n-docker-compose.yaml.template..."
   cat > n8n-docker-compose.yaml.template << EOL
 version: '3'
 
@@ -64,15 +64,15 @@ networks:
     driver: bridge
 EOL
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось создать файл n8n-docker-compose.yaml.template"
+    echo "ERROR: Failed to create file n8n-docker-compose.yaml.template"
     exit 1
   fi
 else
-  echo "Шаблон n8n-docker-compose.yaml.template уже существует"
+  echo "Template n8n-docker-compose.yaml.template already exists"
 fi
 
 if [ ! -f "flowise-docker-compose.yaml.template" ]; then
-  echo "Создание шаблона flowise-docker-compose.yaml.template..."
+  echo "Creating template flowise-docker-compose.yaml.template..."
   cat > flowise-docker-compose.yaml.template << EOL
 version: '3'
 
@@ -95,28 +95,28 @@ networks:
     external: true
 EOL
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось создать файл flowise-docker-compose.yaml.template"
+    echo "ERROR: Failed to create file flowise-docker-compose.yaml.template"
     exit 1
   fi
 else
-  echo "Шаблон flowise-docker-compose.yaml.template уже существует"
+  echo "Template flowise-docker-compose.yaml.template already exists"
 fi
 
-# Копирование шаблонов в рабочие файлы
+# Copy templates to working files
 cp n8n-docker-compose.yaml.template n8n-docker-compose.yaml
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось скопировать n8n-docker-compose.yaml.template в рабочий файл"
+  echo "ERROR: Failed to copy n8n-docker-compose.yaml.template to working file"
   exit 1
 fi
 
 cp flowise-docker-compose.yaml.template flowise-docker-compose.yaml
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось скопировать flowise-docker-compose.yaml.template в рабочий файл"
+  echo "ERROR: Failed to copy flowise-docker-compose.yaml.template to working file"
   exit 1
 fi
 
-# Создание Caddyfile
-echo "Создание файла Caddyfile..."
+# Create Caddyfile
+echo "Creating Caddyfile..."
 cat > Caddyfile << EOL
 n8n.${DOMAIN_NAME} {
     reverse_proxy n8n:5678
@@ -127,16 +127,16 @@ flowise.${DOMAIN_NAME} {
 }
 EOL
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось создать файл Caddyfile"
+  echo "ERROR: Failed to create Caddyfile"
   exit 1
 fi
 
-# Копирование файла в рабочую директорию
+# Copy file to working directory
 sudo cp Caddyfile /opt/n8n/
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось скопировать Caddyfile в /opt/n8n/"
+  echo "ERROR: Failed to copy Caddyfile to /opt/n8n/"
   exit 1
 fi
 
-echo "✅ Шаблоны и конфигурационные файлы успешно созданы"
+echo "✅ Templates and configuration files successfully created"
 exit 0 

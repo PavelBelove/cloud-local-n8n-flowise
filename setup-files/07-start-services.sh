@@ -1,67 +1,67 @@
 #!/bin/bash
 
-echo "Запуск сервисов..."
+echo "Starting services..."
 
-# Проверяем наличие необходимых файлов
+# Check for required files
 if [ ! -f "n8n-docker-compose.yaml" ]; then
-  echo "ОШИБКА: Файл n8n-docker-compose.yaml не найден"
+  echo "ERROR: File n8n-docker-compose.yaml not found"
   exit 1
 fi
 
 if [ ! -f "flowise-docker-compose.yaml" ]; then
-  echo "ОШИБКА: Файл flowise-docker-compose.yaml не найден"
+  echo "ERROR: File flowise-docker-compose.yaml not found"
   exit 1
 fi
 
 if [ ! -f ".env" ]; then
-  echo "ОШИБКА: Файл .env не найден"
+  echo "ERROR: File .env not found"
   exit 1
 fi
 
-# Запуск n8n и Caddy
-echo "Запуск n8n и Caddy..."
+# Start n8n and Caddy
+echo "Starting n8n and Caddy..."
 sudo docker compose -f n8n-docker-compose.yaml up -d
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось запустить n8n и Caddy"
+  echo "ERROR: Failed to start n8n and Caddy"
   exit 1
 fi
 
-# Подождем немного, пока создастся сеть
-echo "Ожидание создания сети docker..."
+# Wait a bit for the network to be created
+echo "Waiting for docker network creation..."
 sleep 5
 
-# Проверяем, создалась ли сеть app-network
+# Check if app-network was created
 if ! sudo docker network inspect app-network &> /dev/null; then
-  echo "ОШИБКА: Не удалось создать сеть app-network"
+  echo "ERROR: Failed to create app-network"
   exit 1
 fi
 
-# Запуск Flowise
-echo "Запуск Flowise..."
+# Start Flowise
+echo "Starting Flowise..."
 sudo docker compose -f flowise-docker-compose.yaml up -d
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось запустить Flowise"
+  echo "ERROR: Failed to start Flowise"
   exit 1
 fi
 
-# Проверка, что все контейнеры запущены
-echo "Проверка запущенных контейнеров..."
+# Check that all containers are running
+echo "Checking running containers..."
 sleep 5
 
 if ! sudo docker ps | grep -q "n8n"; then
-  echo "ОШИБКА: Контейнер n8n не запущен"
+  echo "ERROR: Container n8n is not running"
   exit 1
 fi
 
 if ! sudo docker ps | grep -q "caddy"; then
-  echo "ОШИБКА: Контейнер caddy не запущен"
+  echo "ERROR: Container caddy is not running"
   exit 1
 fi
 
 if ! sudo docker ps | grep -q "flowise"; then
-  echo "ОШИБКА: Контейнер flowise не запущен"
+  echo "ERROR: Container flowise is not running"
   exit 1
 fi
 
-echo "✅ Сервисы n8n, Flowise и Caddy успешно запущены"
+echo "✅ Services n8n, Flowise and Caddy successfully started"
 exit 0 

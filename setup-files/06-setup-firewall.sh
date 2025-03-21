@@ -1,66 +1,66 @@
 #!/bin/bash
 
-echo "Настройка брандмауэра..."
+echo "Setting up firewall..."
 
-# Проверяем, установлен ли ufw
+# Check if ufw is installed
 if command -v ufw &> /dev/null; then
-  echo "UFW уже установлен, открываем необходимые порты..."
+  echo "UFW is already installed, opening required ports..."
   
-  # Открываем порты
+  # Open ports
   sudo ufw allow 80
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось открыть порт 80"
+    echo "ERROR: Failed to open port 80"
     exit 1
   fi
   
   sudo ufw allow 443
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось открыть порт 443"
+    echo "ERROR: Failed to open port 443"
     exit 1
   fi
   
-  # Проверяем, активен ли ufw
+  # Check if ufw is active
   sudo ufw status | grep -q "Status: active"
   if [ $? -ne 0 ]; then
-    echo "UFW не активен, активируем..."
+    echo "UFW is not active, activating..."
     sudo ufw --force enable
     if [ $? -ne 0 ]; then
-      echo "ОШИБКА: Не удалось активировать UFW"
+      echo "ERROR: Failed to activate UFW"
       exit 1
     fi
   fi
   
-  echo "Порты 80 и 443 открыты в брандмауэре"
+  echo "Ports 80 and 443 are open in the firewall"
 else
-  echo "UFW не установлен. Установка..."
+  echo "UFW is not installed. Installing..."
   sudo apt-get install -y ufw
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось установить UFW"
+    echo "ERROR: Failed to install UFW"
     exit 1
   fi
   
-  # Открываем порты
+  # Open ports
   sudo ufw allow 80
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось открыть порт 80"
+    echo "ERROR: Failed to open port 80"
     exit 1
   fi
   
   sudo ufw allow 443
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось открыть порт 443"
+    echo "ERROR: Failed to open port 443"
     exit 1
   fi
   
-  # Активируем брандмауэр
+  # Activate firewall
   sudo ufw --force enable
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось активировать UFW"
+    echo "ERROR: Failed to activate UFW"
     exit 1
   fi
   
-  echo "Брандмауэр установлен и порты 80, 443 открыты"
+  echo "Firewall installed and ports 80, 443 are open"
 fi
 
-echo "✅ Брандмауэр успешно настроен"
+echo "✅ Firewall successfully configured"
 exit 0 

@@ -1,95 +1,95 @@
 #!/bin/bash
 
-echo "Настройка директорий и пользователей..."
+echo "Setting up directories and users..."
 
-# Создание пользователя n8n, если он не существует
+# Creating n8n user if it doesn't exist
 if ! id "n8n" &>/dev/null; then
-  echo "Создание пользователя n8n..."
+  echo "Creating n8n user..."
   sudo adduser --disabled-password --gecos "" n8n
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось создать пользователя n8n"
+    echo "ERROR: Failed to create n8n user"
     exit 1
   fi
   
-  # Генерация случайного пароля
+  # Generate random password
   N8N_PASSWORD=$(openssl rand -base64 12)
   echo "n8n:$N8N_PASSWORD" | sudo chpasswd
   if [ $? -ne 0 ]; then
-    echo "ОШИБКА: Не удалось установить пароль для пользователя n8n"
+    echo "ERROR: Failed to set password for n8n user"
     exit 1
   fi
   
-  echo "✅ Создан пользователь n8n с паролем: $N8N_PASSWORD"
-  echo "⚠️ ВАЖНО: Запишите этот пароль, он вам понадобится для работы с Docker!"
+  echo "✅ Created n8n user with password: $N8N_PASSWORD"
+  echo "⚠️ IMPORTANT: Write down this password, you will need it for working with Docker!"
   
   sudo usermod -aG docker n8n
   if [ $? -ne 0 ]; then
-    echo "ПРЕДУПРЕЖДЕНИЕ: Не удалось добавить пользователя n8n в группу docker"
-    # Не выходим, так как это не критическая ошибка
+    echo "WARNING: Failed to add n8n user to docker group"
+    # Not exiting as this is not a critical error
   fi
 else
-  echo "Пользователь n8n уже существует"
+  echo "User n8n already exists"
   
-  # Если пользователь существует, но нужно сбросить пароль
-  read -p "Хотите сбросить пароль для пользователя n8n? (y/n): " reset_password
+  # If user exists but password needs to be reset
+  read -p "Do you want to reset the password for n8n user? (y/n): " reset_password
   if [ "$reset_password" = "y" ]; then
     N8N_PASSWORD=$(openssl rand -base64 12)
     echo "n8n:$N8N_PASSWORD" | sudo chpasswd
     if [ $? -ne 0 ]; then
-      echo "ОШИБКА: Не удалось сбросить пароль для пользователя n8n"
+      echo "ERROR: Failed to reset password for n8n user"
     else
-      echo "✅ Пароль для пользователя n8n сброшен: $N8N_PASSWORD"
-      echo "⚠️ ВАЖНО: Запишите этот пароль, он вам понадобится для работы с Docker!"
+      echo "✅ Password for n8n user has been reset: $N8N_PASSWORD"
+      echo "⚠️ IMPORTANT: Write down this password, you will need it for working with Docker!"
     fi
   fi
 fi
 
-# Создание необходимых директорий
-echo "Создание директорий..."
+# Creating necessary directories
+echo "Creating directories..."
 sudo mkdir -p /opt/n8n
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось создать директорию /opt/n8n"
+  echo "ERROR: Failed to create directory /opt/n8n"
   exit 1
 fi
 
 sudo mkdir -p /opt/n8n/files
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось создать директорию /opt/n8n/files"
+  echo "ERROR: Failed to create directory /opt/n8n/files"
   exit 1
 fi
 
 sudo mkdir -p /opt/flowise
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось создать директорию /opt/flowise"
+  echo "ERROR: Failed to create directory /opt/flowise"
   exit 1
 fi
 
-# Установка прав
+# Setting permissions
 sudo chown -R n8n:n8n /opt/n8n
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось изменить владельца директории /opt/n8n"
+  echo "ERROR: Failed to change owner of directory /opt/n8n"
   exit 1
 fi
 
 sudo chown -R n8n:n8n /opt/flowise
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось изменить владельца директории /opt/flowise"
+  echo "ERROR: Failed to change owner of directory /opt/flowise"
   exit 1
 fi
 
-# Создание docker volumes
-echo "Создание Docker volumes..."
+# Creating docker volumes
+echo "Creating Docker volumes..."
 sudo docker volume create n8n_data
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось создать Docker volume n8n_data"
+  echo "ERROR: Failed to create Docker volume n8n_data"
   exit 1
 fi
 
 sudo docker volume create caddy_data
 if [ $? -ne 0 ]; then
-  echo "ОШИБКА: Не удалось создать Docker volume caddy_data"
+  echo "ERROR: Failed to create Docker volume caddy_data"
   exit 1
 fi
 
-echo "✅ Директории и пользователи успешно настроены"
+echo "✅ Directories and users successfully configured"
 exit 0 

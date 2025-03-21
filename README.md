@@ -1,118 +1,117 @@
 # Cloud-Local n8n & Flowise Setup
 
-Автоматизированный скрипт установки n8n и Flowise с reverse прокси-сервером Caddy для безопасного доступа через HTTPS.
+Automated installation script for n8n and Flowise with reverse proxy server Caddy for secure access via HTTPS.
 
-## Описание
+## Description
 
-Этот репозиторий содержит скрипты для автоматической настройки:
+This repository contains scripts for automatic configuration of:
 
-- **n8n** - мощная платформа автоматизации рабочих процессов с открытым исходным кодом
-- **Flowise** - инструмент для создания настраиваемых AI-потоков
-- **Caddy** - современный веб-сервер с автоматическим HTTPS
+- **n8n** - a powerful open-source workflow automation platform
+- **Flowise** - a tool for creating customizable AI flows
+- **Caddy** - a modern web server with automatic HTTPS
 
-Система настраивается для работы с вашим доменным именем и автоматически получает SSL-сертификаты Let's Encrypt.
+The system is configured to work with your domain name and automatically obtains Let's Encrypt SSL certificates.
 
-## Требования
+## Requirements
 
 - Ubuntu 22.04 
-- Доменное имя, направленное на IP-адрес вашего сервера
-- Доступ к серверу с правами администратора (sudo)
-- Открытые порты 80, 443 
+- Domain name pointing to your server's IP address
+- Server access with administrator rights (sudo)
+- Open ports 80, 443 
 
-## Установка
+## Installation
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
    ```bash
-   git clone https://github.com/miolamio/cloud-local-n8n-flowise.git
-   cd cloud-local-n8n-flowise
+   git clone https://github.com/miolamio/cloud-local-n8n-flowise.git && cd cloud-local-n8n-flowise
    ```
 
-2. Сделайте скрипт исполняемым:
+2. Make the script executable:
    ```bash
    chmod +x setup.sh
    ```
 
-3. Запустите скрипт установки:
+3. Run the installation script:
    ```bash
    ./setup.sh
    ```
 
-4. Следуйте инструкциям в терминале:
-   - Введите ваше доменное имя (например, example.com)
-   - Введите ваш email (будет использоваться для входа в n8n и для Let's Encrypt)
+4. Follow the instructions in the terminal:
+   - Enter your domain name (e.g., example.com)
+   - Enter your email (will be used for n8n login and Let's Encrypt)
 
-## Что делает скрипт установки
+## What the installation script does
 
-1. **Обновление системы** - обновляет список пакетов и устанавливает необходимые зависимости
-2. **Установка Docker** - устанавливает Docker Engine и Docker Compose
-3. **Настройка директорий** - создает пользователя n8n и необходимые директории
-4. **Генерация секретов** - создает случайные пароли и ключи шифрования
-5. **Создание конфигурационных файлов** - генерирует файлы docker-compose и Caddyfile
-6. **Настройка брандмауэра** - открывает необходимые порты
-7. **Запуск сервисов** - запускает контейнеры Docker
+1. **System update** - updates the package list and installs necessary dependencies
+2. **Docker installation** - installs Docker Engine and Docker Compose
+3. **Directory setup** - creates n8n user and necessary directories
+4. **Secret generation** - creates random passwords and encryption keys
+5. **Configuration file creation** - generates docker-compose files and Caddyfile
+6. **Firewall setup** - opens necessary ports
+7. **Service launch** - starts Docker containers
 
-## Доступ к сервисам
+## Accessing services
 
-После завершения установки вы получите доступ к сервисам по следующим URL:
+After installation completes, you will be able to access services at the following URLs:
 
-- **n8n**: https://n8n.ваш-домен.xxx
-- **Flowise**: https://flowise.ваш-домен.xxx
+- **n8n**: https://n8n.your-domain.xxx
+- **Flowise**: https://flowise.your-domain.xxx
 
-Учетные данные для входа будут отображены в конце процесса установки.
+Login credentials will be displayed at the end of the installation process.
 
-## Структура проекта
+## Project structure
 
-- `setup.sh` - основной скрипт установки
-- `setup-files/` - директория с вспомогательными скриптами:
-  - `01-update-system.sh` - обновление системы
-  - `02-install-docker.sh` - установка Docker
-  - `03-setup-directories.sh` - настройка директорий и пользователей
-  - `04-generate-secrets.sh` - генерация секретных ключей
-  - `05-create-templates.sh` - создание конфигурационных файлов
-  - `06-setup-firewall.sh` - настройка брандмауэра
-  - `07-start-services.sh` - запуск сервисов
-- `n8n-docker-compose.yaml.template` - шаблон docker-compose для n8n и Caddy
-- `flowise-docker-compose.yaml.template` - шаблон docker-compose для Flowise
+- `setup.sh` - main installation script
+- `setup-files/` - directory with helper scripts:
+  - `01-update-system.sh` - system update
+  - `02-install-docker.sh` - Docker installation
+  - `03-setup-directories.sh` - directory and user setup
+  - `04-generate-secrets.sh` - secret key generation
+  - `05-create-templates.sh` - configuration file creation
+  - `06-setup-firewall.sh` - firewall setup
+  - `07-start-services.sh` - service launch
+- `n8n-docker-compose.yaml.template` - docker-compose template for n8n and Caddy
+- `flowise-docker-compose.yaml.template` - docker-compose template for Flowise
 
-## Управление сервисами
+## Managing services
 
-### Перезапуск сервисов
+### Restarting services
 
 ```bash
 docker compose -f n8n-docker-compose.yaml restart
 docker compose -f flowise-docker-compose.yaml restart
 ```
 
-### Остановка сервисов
+### Stopping services
 
 ```bash
 docker compose -f n8n-docker-compose.yaml down
 docker compose -f flowise-docker-compose.yaml down
 ```
 
-### Просмотр логов
+### Viewing logs
 
 ```bash
 docker compose -f n8n-docker-compose.yaml logs
 docker compose -f flowise-docker-compose.yaml logs
 ```
 
-## Безопасность
+## Security
 
-- Все сервисы доступны только через HTTPS с автоматически обновляемыми сертификатами Let's Encrypt
-- Создаются случайные пароли для n8n и Flowise
-- Пользователи создаются с минимально необходимыми привилегиями
+- All services are accessible only via HTTPS with automatically renewed Let's Encrypt certificates
+- Random passwords are created for n8n and Flowise
+- Users are created with minimal necessary privileges
 
-## Устранение неполадок
+## Troubleshooting
 
-- Проверьте DNS-записи вашего домена, убедитесь что они указывают на правильный IP-адрес
-- Проверьте, что порты 80 и 443 открыты на вашем сервере
-- Просмотрите логи контейнеров для обнаружения ошибок
+- Check your domain's DNS records to ensure they point to the correct IP address
+- Verify that ports 80 and 443 are open on your server
+- View container logs to detect errors
 
-## Лицензия
+## License
 
-Этот проект распространяется под лицензией MIT. 
+This project is distributed under the MIT License.
 
-## Автор
+## Author
 
 @codegeek
