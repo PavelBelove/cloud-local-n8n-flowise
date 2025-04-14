@@ -102,6 +102,69 @@ else
   echo "Template flowise-docker-compose.yaml.template already exists"
 fi
 
+# Create Zep template if it doesn't exist
+if [ ! -f "zep-docker-compose.yaml.template" ]; then
+  echo "Creating template zep-docker-compose.yaml.template..."
+  cat > zep-docker-compose.yaml.template << EOL
+version: '3'
+
+services:
+  zep:
+    image: ghcr.io/getzep/zep:latest
+    container_name: zep
+    restart: unless-stopped
+    environment:
+      - ZEP_OPENAI_API_KEY=\${OPENROUTER_API_KEY}
+      - ZEP_OPENAI_API_BASE=https://openrouter.ai/api/v1
+      - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - ZEP_OPENAI_CHAT_MODEL=\${OPENROUTER_MODEL}
+      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://\${ZEP_POSTGRES_USER}:\${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/\${ZEP_POSTGRES_DB}?sslmode=disable
+      - ZEP_QDRANT_URL=http://qdrant:6333
+    mem_limit: 512m
+    cpus: 0.5
+    volumes:
+      - /opt/zep/data:/data
+    networks:
+      - app-network
+
+  zep-postgres:
+    image: postgres:15
+    container_name: zep-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=\${ZEP_POSTGRES_USER}
+      - POSTGRES_PASSWORD=\${ZEP_POSTGRES_PASSWORD}
+      - POSTGRES_DB=\${ZEP_POSTGRES_DB}
+    mem_limit: 512m
+    cpus: 0.5
+    volumes:
+      - /opt/zep/postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: 0.5
+    volumes:
+      - /opt/zep/qdrant-data:/qdrant/storage
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+EOL
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to create file zep-docker-compose.yaml.template"
+    exit 1
+  fi
+else
+  echo "Template zep-docker-compose.yaml.template already exists"
+fi
+
 # Copy templates to working files
 cp n8n-docker-compose.yaml.template n8n-docker-compose.yaml
 if [ $? -ne 0 ]; then
@@ -115,6 +178,12 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+cp zep-docker-compose.yaml.template zep-docker-compose.yaml
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to copy zep-docker-compose.yaml.template to working file"
+  exit 1
+fi
+
 # Create Caddyfile
 echo "Creating Caddyfile..."
 cat > Caddyfile << EOL
@@ -124,6 +193,10 @@ n8n.${DOMAIN_NAME} {
 
 flowise.${DOMAIN_NAME} {
     reverse_proxy flowise:3001
+}
+
+zep.${DOMAIN_NAME} {
+    reverse_proxy zep:8000
 }
 EOL
 if [ $? -ne 0 ]; then

@@ -55,6 +55,29 @@ if [ -z "$FLOWISE_PASSWORD" ]; then
   exit 1
 fi
 
+# Generating Zep database secrets
+ZEP_POSTGRES_USER="zep"
+ZEP_POSTGRES_PASSWORD=$(generate_safe_password 16)
+if [ -z "$ZEP_POSTGRES_PASSWORD" ]; then
+  echo "ERROR: Failed to generate password for Zep PostgreSQL"
+  exit 1
+fi
+ZEP_POSTGRES_DB="zep"
+
+# Request OpenRouter API key
+read -p "Enter your OpenRouter API key: " OPENROUTER_API_KEY
+while [[ -z "$OPENROUTER_API_KEY" ]]; do
+  echo "OpenRouter API key cannot be empty"
+  read -p "Enter your OpenRouter API key: " OPENROUTER_API_KEY
+done
+
+# Default model setting with option to change
+OPENROUTER_MODEL="meta-llama/llama-4-maverick:free"
+read -p "Enter OpenRouter model to use (default: ${OPENROUTER_MODEL}): " USER_MODEL
+if [[ ! -z "$USER_MODEL" ]]; then
+  OPENROUTER_MODEL=$USER_MODEL
+fi
+
 # Writing values to .env file
 cat > .env << EOL
 # Settings for n8n
@@ -73,6 +96,15 @@ FLOWISE_PASSWORD=$FLOWISE_PASSWORD
 
 # Domain settings
 DOMAIN_NAME=$DOMAIN_NAME
+
+# Zep database settings
+ZEP_POSTGRES_USER=$ZEP_POSTGRES_USER
+ZEP_POSTGRES_PASSWORD=$ZEP_POSTGRES_PASSWORD
+ZEP_POSTGRES_DB=$ZEP_POSTGRES_DB
+
+# OpenRouter settings
+OPENROUTER_API_KEY=$OPENROUTER_API_KEY
+OPENROUTER_MODEL=$OPENROUTER_MODEL
 EOL
 
 if [ $? -ne 0 ]; then
@@ -83,10 +115,12 @@ fi
 echo "Secret keys generated and saved to .env file"
 echo "Password for n8n: $N8N_PASSWORD"
 echo "Password for Flowise: $FLOWISE_PASSWORD"
+echo "Password for Zep PostgreSQL: $ZEP_POSTGRES_PASSWORD"
 
 # Save passwords for future use - using quotes to properly handle special characters
 echo "N8N_PASSWORD=\"$N8N_PASSWORD\"" > ./setup-files/passwords.txt
 echo "FLOWISE_PASSWORD=\"$FLOWISE_PASSWORD\"" >> ./setup-files/passwords.txt
+echo "ZEP_POSTGRES_PASSWORD=\"$ZEP_POSTGRES_PASSWORD\"" >> ./setup-files/passwords.txt
 
 echo "✅ Secret keys and passwords successfully generated"
 exit 0 
