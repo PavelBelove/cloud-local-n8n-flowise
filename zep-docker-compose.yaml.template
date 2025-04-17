@@ -6,6 +6,7 @@ services:
     container_name: zep
     restart: unless-stopped
     environment:
+      - ZEP_STORE_TYPE=postgres
       - ZEP_OPENAI_API_KEY=${OPENROUTER_API_KEY}
       - ZEP_OPENAI_API_BASE=https://openrouter.ai/api/v1
       - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2

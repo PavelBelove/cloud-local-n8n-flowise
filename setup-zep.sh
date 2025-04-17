@@ -103,15 +103,12 @@ services:
     restart: unless-stopped
     environment:
       - ZEP_STORE_TYPE=postgres
-      - ZEP_MEMORY_STORE_TYPE=postgres
-      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://${ZEP_POSTGRES_USER}:${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/${ZEP_POSTGRES_DB}?sslmode=disable
-      - ZEP_VECTOR_STORE_TYPE=qdrant
-      - ZEP_VECTOR_STORE_QDRANT_URL=http://qdrant:6333
       - ZEP_OPENAI_API_KEY=${OPENROUTER_API_KEY}
       - ZEP_OPENAI_API_BASE=https://openrouter.ai/api/v1
       - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - ZEP_OPENAI_CHAT_MODEL=${OPENROUTER_MODEL}
-      - ZEP_SERVER_BASE_URL=https://zep.${DOMAIN_NAME}
+      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://${ZEP_POSTGRES_USER}:${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/${ZEP_POSTGRES_DB}?sslmode=disable
+      - ZEP_QDRANT_URL=http://qdrant:6333
     mem_limit: 512m
     cpus: 0.5
     volumes:
@@ -207,14 +204,7 @@ EOL"
   fi
   
   # Save password information
-  cat > ./zep-passwords.txt << EOL
-ZEP_POSTGRES_USER="${ZEP_POSTGRES_USER}"
-ZEP_POSTGRES_PASSWORD="${ZEP_POSTGRES_PASSWORD}"
-ZEP_POSTGRES_DB="${ZEP_POSTGRES_DB}"
-OPENROUTER_API_KEY="${OPENROUTER_API_KEY}"
-OPENROUTER_MODEL="${OPENROUTER_MODEL}"
-DOMAIN_NAME="${DOMAIN_NAME}"
-EOL
+  echo "ZEP_POSTGRES_PASSWORD=\"$ZEP_POSTGRES_PASSWORD\"" > ./zep-passwords.txt
   
   # Installation successfully completed
   show_progress "✅ Zep installation successfully completed!"
@@ -232,7 +222,7 @@ EOL
   echo "- Restart: docker compose -f zep-docker-compose.yaml restart"
   echo "- View logs: docker compose -f zep-docker-compose.yaml logs"
   echo ""
-  echo "All configuration information is saved in ./zep-passwords.txt"
+  echo "Password information is saved in ./zep-passwords.txt"
 }
 
 # Run main function
