@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  zep:
+    image: ghcr.io/getzep/zep:latest
+    container_name: zep
+    restart: unless-stopped
+    environment:
+      - ZEP_OPENAI_API_KEY=your_openrouter_key_here # Заменить на ваш ключ
+      - ZEP_OPENAI_API_BASE=https://openrouter.ai/api/v1
+      - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - ZEP_OPENAI_CHAT_MODEL=meta-llama/llama-4-maverick:free # Заменить если нужно
+      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://zep:zep_password_here@zep-postgres:5432/zep?sslmode=disable # Заменить пароль
+      - ZEP_QDRANT_URL=http://qdrant:6333
+      - ZEP_STORE_TYPE=postgres
+    mem_limit: 512m
+    cpus: 0.5
+    volumes:
+      - /opt/zep/data:/data
+    networks:
+      - app-network
+
+  zep-postgres:
+    image: postgres:15
+    container_name: zep-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=zep
+      - POSTGRES_PASSWORD=zep_password_here # Заменить на тот же пароль
+      - POSTGRES_DB=zep
+    mem_limit: 512m
+    cpus: 0.5
+    volumes:
+      - /opt/zep/postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: 0.5
+    volumes:
+      - /opt/zep/qdrant-data:/qdrant/storage
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true 
