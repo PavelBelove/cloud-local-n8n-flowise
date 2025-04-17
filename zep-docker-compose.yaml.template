@@ -12,7 +12,6 @@ services:
       - ZEP_OPENAI_CHAT_MODEL=${OPENROUTER_MODEL}
       - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://${ZEP_POSTGRES_USER}:${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/${ZEP_POSTGRES_DB}?sslmode=disable
       - ZEP_QDRANT_URL=http://qdrant:6333
-      - ZEP_STORE_TYPE=postgres
     mem_limit: 512m
     cpus: 0.5
     volumes:
