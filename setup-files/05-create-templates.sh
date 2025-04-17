@@ -105,7 +105,7 @@ fi
 # Create Zep template if it doesn't exist
 if [ ! -f "zep-docker-compose.yaml.template" ]; then
   echo "Creating template zep-docker-compose.yaml.template..."
-  cat > zep-docker-compose.yaml.template << EOL
+  cat > zep-docker-compose.yaml.template << 'EOL'
 version: '3'
 
 services:
@@ -114,12 +114,13 @@ services:
     container_name: zep
     restart: unless-stopped
     environment:
-      - ZEP_OPENAI_API_KEY=\${OPENROUTER_API_KEY}
+      - ZEP_OPENAI_API_KEY=${OPENROUTER_API_KEY}
       - ZEP_OPENAI_API_BASE=https://openrouter.ai/api/v1
       - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2
-      - ZEP_OPENAI_CHAT_MODEL=\${OPENROUTER_MODEL}
-      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://\${ZEP_POSTGRES_USER}:\${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/\${ZEP_POSTGRES_DB}?sslmode=disable
+      - ZEP_OPENAI_CHAT_MODEL=${OPENROUTER_MODEL}
+      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://${ZEP_POSTGRES_USER}:${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/${ZEP_POSTGRES_DB}?sslmode=disable
       - ZEP_QDRANT_URL=http://qdrant:6333
+      - ZEP_STORE_TYPE=postgres
     mem_limit: 512m
     cpus: 0.5
     volumes:
@@ -132,9 +133,9 @@ services:
     container_name: zep-postgres
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=\${ZEP_POSTGRES_USER}
-      - POSTGRES_PASSWORD=\${ZEP_POSTGRES_PASSWORD}
-      - POSTGRES_DB=\${ZEP_POSTGRES_DB}
+      - POSTGRES_USER=${ZEP_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${ZEP_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${ZEP_POSTGRES_DB}
     mem_limit: 512m
     cpus: 0.5
     volumes:
