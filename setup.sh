@@ -20,7 +20,7 @@ show_progress() {
 
 # Main installation function
 main() {
-  show_progress "🚀 Starting installation of n8n, Flowise, Zep, and Caddy"
+  show_progress "🚀 Starting installation of n8n, Flowise, Zep, crawl4ai, and Caddy"
   
   # Check administrator rights
   if [ "$EUID" -ne 0 ]; then
@@ -62,42 +62,42 @@ main() {
   chmod +x setup-files/*.sh 2>/dev/null || true
   
   # Step 1: System update
-  show_progress "Step 1/8: System update"
+  show_progress "Step 1/9: System update"
   ./setup-files/01-update-system.sh
   check_success "system update"
   
   # Step 2: Docker installation
-  show_progress "Step 2/8: Docker installation"
+  show_progress "Step 2/9: Docker installation"
   ./setup-files/02-install-docker.sh
   check_success "Docker installation"
   
   # Step 3: Directory setup
-  show_progress "Step 3/8: Directory setup"
+  show_progress "Step 3/9: Directory setup"
   ./setup-files/03-setup-directories.sh
   check_success "directory setup"
   
   # Step 4: Secret key generation
-  show_progress "Step 4/8: Secret key generation"
+  show_progress "Step 4/9: Secret key generation"
   ./setup-files/04-generate-secrets.sh "$USER_EMAIL" "$DOMAIN_NAME" "$GENERIC_TIMEZONE"
   check_success "secret key generation"
   
   # Step 5: Template creation
-  show_progress "Step 5/8: Configuration file creation"
+  show_progress "Step 5/9: Configuration file creation"
   ./setup-files/05-create-templates.sh "$DOMAIN_NAME"
   check_success "configuration file creation"
   
   # Step 6: Firewall setup
-  show_progress "Step 6/8: Firewall setup"
+  show_progress "Step 6/9: Firewall setup"
   ./setup-files/06-setup-firewall.sh
   check_success "firewall setup"
   
   # Step 7: Zep setup
-  show_progress "Step 7/8: Zep setup"
+  show_progress "Step 7/9: Zep setup"
   ./setup-files/08-setup-zep.sh
   check_success "Zep setup"
   
   # Step 8: Service launch
-  show_progress "Step 8/8: Service launch"
+  show_progress "Step 8/9: Service launch"
   ./setup-files/07-start-services.sh
   check_success "service launch"
   
@@ -116,6 +116,7 @@ main() {
   echo "n8n is available at: https://n8n.${DOMAIN_NAME}"
   echo "Flowise is available at: https://flowise.${DOMAIN_NAME}"
   echo "Zep is available at: https://zep.${DOMAIN_NAME}"
+  echo "crawl4ai is available at: https://crawl4ai.${DOMAIN_NAME}"
   echo ""
   echo "Login credentials for n8n:"
   echo "Email: ${USER_EMAIL}"
@@ -129,13 +130,15 @@ main() {
   echo "Zep Admin API Key: ${ZEP_ADMIN_API_KEY:-<check the .env file>}"
   echo "PostgreSQL Password for Zep: ${ZEP_POSTGRES_PASSWORD:-<check the .env file>}"
   echo ""
+  echo "crawl4ai API Endpoint: https://crawl4ai.${DOMAIN_NAME}/api/v1/crawl/"
+  echo ""
   echo "Please note that for the domain name to work, you need to configure DNS records"
-  echo "pointing to the IP address of this server."
   echo ""
   echo "To edit the configuration, use the following files:"
   echo "- n8n-docker-compose.yaml (n8n and Caddy configuration)"
   echo "- flowise-docker-compose.yaml (Flowise configuration)"
   echo "- zep-docker-compose.yaml (Zep, PostgreSQL, and Qdrant configuration)"
+  echo "- crawl4ai-docker-compose.yaml (crawl4ai configuration)"
   echo "- .env (environment variables for all services)"
   echo "- Caddyfile (reverse proxy settings)"
   echo ""
@@ -143,6 +146,7 @@ main() {
   echo "docker compose -f n8n-docker-compose.yaml restart"
   echo "docker compose -f flowise-docker-compose.yaml restart"
   echo "docker compose -f zep-docker-compose.yaml restart"
+  echo "docker compose -f crawl4ai-docker-compose.yaml restart"
 }
 
 # Run main function

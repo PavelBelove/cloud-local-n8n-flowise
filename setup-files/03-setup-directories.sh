@@ -64,6 +64,13 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Create directory for crawl4ai cache
+sudo mkdir -p /opt/crawl4ai/cache
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to create directory /opt/crawl4ai/cache"
+  exit 1
+fi
+
 # Setting permissions
 sudo chown -R n8n:n8n /opt/n8n
 if [ $? -ne 0 ]; then
@@ -74,6 +81,12 @@ fi
 sudo chown -R n8n:n8n /opt/flowise
 if [ $? -ne 0 ]; then
   echo "ERROR: Failed to change owner of directory /opt/flowise"
+  exit 1
+fi
+
+sudo chown -R n8n:n8n /opt/crawl4ai
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to change owner of directory /opt/crawl4ai"
   exit 1
 fi
 

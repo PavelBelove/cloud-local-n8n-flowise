@@ -1,0 +1,26 @@
+version: '3'
+
+volumes:
+  crawl4ai_cache:
+    driver: local
+
+services:
+  crawl4ai:
+    build:
+      context: ./crawl4ai-docker
+    container_name: crawl4ai
+    restart: unless-stopped
+    volumes:
+      - crawl4ai_cache:/app/cache # Mount the cache volume
+    networks:
+      - app-network
+    # Expose port 8001 internally for Caddy
+    expose:
+      - 8001
+    # Resource limits (adjust as needed)
+    mem_limit: 512m
+    cpus: 0.5
+
+networks:
+  app-network:
+    external: true 

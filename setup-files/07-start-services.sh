@@ -18,8 +18,21 @@ if [ ! -f "zep-docker-compose.yaml" ]; then
   exit 1
 fi
 
+if [ ! -f "crawl4ai-docker-compose.yaml" ]; then
+  echo "ERROR: File crawl4ai-docker-compose.yaml not found"
+  exit 1
+fi
+
 if [ ! -f ".env" ]; then
   echo "ERROR: File .env not found"
+  exit 1
+fi
+
+# Build crawl4ai image first (might take time)
+echo "Building crawl4ai image (this may take several minutes)..."
+sudo docker compose -f crawl4ai-docker-compose.yaml build
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to build crawl4ai image"
   exit 1
 fi
 
@@ -57,6 +70,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Start crawl4ai
+echo "Starting crawl4ai service..."
+sudo docker compose -f crawl4ai-docker-compose.yaml up -d
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to start crawl4ai service"
+  exit 1
+fi
+
 # Check that all containers are running
 echo "Checking running containers..."
 sleep 5
@@ -91,5 +112,10 @@ if ! sudo docker ps | grep -q "qdrant"; then
   exit 1
 fi
 
-echo "✅ Services n8n, Flowise, Zep and Caddy successfully started"
+if ! sudo docker ps | grep -q "crawl4ai"; then
+  echo "ERROR: Container crawl4ai is not running"
+  exit 1
+fi
+
+echo "✅ Services n8n, Flowise, Zep, crawl4ai and Caddy successfully started"
 exit 0 
