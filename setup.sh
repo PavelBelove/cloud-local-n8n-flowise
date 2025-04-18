@@ -105,13 +105,18 @@ main() {
   ./setup-files/07-start-services.sh
   check_success "service launch"
   
-  # Load generated passwords
-  N8N_PASSWORD=""
-  FLOWISE_PASSWORD=""
-  ZEP_POSTGRES_PASSWORD=""
-  ZEP_ADMIN_API_KEY=""
-  if [ -f "./setup-files/passwords.txt" ]; then
-    source ./setup-files/passwords.txt
+  # Important: Load secrets from .env file as sourcing passwords.txt is unsafe
+  if [ -f ".env" ]; then
+    # Use export to make variables available to the current shell
+    export $(grep -v '^#' .env | xargs)
+  else
+    echo "WARNING: .env file not found. Cannot display final credentials."
+    # Set default empty values to avoid errors in echo commands below
+    USER_EMAIL="N/A"
+    N8N_PASSWORD="N/A"
+    FLOWISE_PASSWORD="N/A"
+    ZEP_ADMIN_API_KEY="N/A"
+    ZEP_POSTGRES_PASSWORD="N/A"
   fi
   
   # Installation successfully completed

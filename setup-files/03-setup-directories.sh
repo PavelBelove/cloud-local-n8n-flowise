@@ -2,46 +2,34 @@
 
 echo "Setting up directories and users..."
 
-# Creating n8n user if it doesn't exist
+# Create or update n8n user
 if ! id "n8n" &>/dev/null; then
   echo "Creating n8n user..."
-  sudo adduser --disabled-password --gecos "" n8n
+  sudo adduser --system --group --no-create-home --disabled-password --gecos "" n8n
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to create n8n user"
     exit 1
   fi
-  
-  # Generate random password
-  N8N_PASSWORD=$(openssl rand -base64 12)
-  echo "n8n:$N8N_PASSWORD" | sudo chpasswd
-  if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to set password for n8n user"
-    exit 1
-  fi
-  
-  echo "✅ Created n8n user with password: $N8N_PASSWORD"
-  echo "⚠️ IMPORTANT: Write down this password, you will need it for working with Docker!"
-  
-  sudo usermod -aG docker n8n
-  if [ $? -ne 0 ]; then
-    echo "WARNING: Failed to add n8n user to docker group"
-    # Not exiting as this is not a critical error
-  fi
 else
-  echo "User n8n already exists"
-  
-  # If user exists but password needs to be reset
-  read -p "Do you want to reset the password for n8n user? (y/n): " reset_password
-  if [ "$reset_password" = "y" ]; then
-    N8N_PASSWORD=$(openssl rand -base64 12)
-    echo "n8n:$N8N_PASSWORD" | sudo chpasswd
-    if [ $? -ne 0 ]; then
-      echo "ERROR: Failed to reset password for n8n user"
-    else
-      echo "✅ Password for n8n user has been reset: $N8N_PASSWORD"
-      echo "⚠️ IMPORTANT: Write down this password, you will need it for working with Docker!"
-    fi
-  fi
+  echo "User n8n already exists. Ensuring group membership..."
+fi
+
+# Ensure user is in the docker group
+sudo usermod -aG docker n8n
+if [ $? -ne 0 ]; then
+  echo "WARNING: Failed to add n8n user to docker group. Docker commands might require sudo."
+  # Not exiting as this might not be critical depending on setup
+fi
+
+# Set/Reset password for n8n user (we don't actually need this password for services, but useful for potential sudo/login)
+N8N_SYSTEM_PASSWORD=$(openssl rand -base64 12)
+echo "n8n:$N8N_SYSTEM_PASSWORD" | sudo chpasswd
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to set password for n8n system user"
+  # Not exiting, as the password isn't strictly needed for docker service operation
+else
+  echo "Password for n8n *system* user set to: $N8N_SYSTEM_PASSWORD"
+  echo "(This system password is not used for n8n application login)"
 fi
 
 # Creating necessary directories

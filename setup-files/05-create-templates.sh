@@ -113,6 +113,10 @@ services:
     image: ghcr.io/getzep/zep:latest
     container_name: zep
     restart: unless-stopped
+    env_file:
+      - .env # Explicitly load variables from the .env file
+    # We keep the environment section for potentially overriding .env values or for clarity,
+    # but env_file often takes precedence. Zep might read this now.
     environment:
       # Store configuration
       - ZEP_STORE_TYPE=postgres # Use postgres for memory and metadata
