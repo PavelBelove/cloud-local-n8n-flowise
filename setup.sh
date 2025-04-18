@@ -35,8 +35,12 @@ main() {
   
   # Request domain name
   read -p "Enter your domain name (e.g., example.com): " DOMAIN_NAME
-  while [[ -z "$DOMAIN_NAME" ]]; do
-    echo "Domain name cannot be empty"
+  while [[ -z "$DOMAIN_NAME" || "$DOMAIN_NAME" == *"@"* ]]; do
+    if [[ -z "$DOMAIN_NAME" ]]; then
+      echo "Domain name cannot be empty"
+    else
+      echo "Invalid domain name format. Please enter a domain name, not an email address."
+    fi
     read -p "Enter your domain name (e.g., example.com): " DOMAIN_NAME
   done
   

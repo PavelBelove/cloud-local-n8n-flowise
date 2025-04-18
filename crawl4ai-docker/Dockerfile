@@ -21,5 +21,5 @@ EXPOSE 8001
 # Define environment variable
 ENV NAME Crawl4AI
 
-# Run uvicorn when the container launches
-CMD ["uvicorn", "crawl4ai.app:app", "--host", "0.0.0.0", "--port", "8001"] 
+# Run uvicorn when the container launches using python -m
+CMD ["python", "-m", "uvicorn", "crawl4ai.app:app", "--host", "0.0.0.0", "--port", "8001"] 
