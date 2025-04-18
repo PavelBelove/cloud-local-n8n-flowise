@@ -9,6 +9,7 @@ fi
 
 echo "Начинаем удаление всех компонентов..."
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PARENT_DIR=$(dirname "$SCRIPT_DIR")
 cd "$SCRIPT_DIR"
 
 # Запрос подтверждения перед удалением
@@ -16,6 +17,12 @@ read -p "Вы уверены, что хотите удалить все комп
 if [ "$CONFIRM" != "y" ]; then
   echo "Удаление отменено"
   exit 0
+fi
+
+# Запрос подтверждения перед удалением папки проекта
+read -p "Удалить папку проекта после очистки? (y/n): " REMOVE_DIR
+if [ "$REMOVE_DIR" != "y" ]; then
+  echo "Папка проекта не будет удалена"
 fi
 
 # Остановка и удаление всех контейнеров
@@ -47,9 +54,22 @@ rm -f n8n-docker-compose.yaml.template flowise-docker-compose.yaml.template zep-
 echo "Удаляем Caddyfile..."
 rm -f Caddyfile || true
 
+# Удаление .env файла
+echo "Удаляем файл .env..."
+rm -f .env || true
+
 # Очистка Docker
 echo "Очищаем Docker от неиспользуемых ресурсов..."
-sudo docker system prune -f
+sudo docker system prune -af
 
-echo "✅ Удаление успешно завершено!"
+# Удаление папки проекта, если запрошено
+if [ "$REMOVE_DIR" == "y" ]; then
+  echo "Удаляем папку проекта..."
+  cd "$PARENT_DIR"
+  rm -rf "$SCRIPT_DIR"
+  echo "✅ Удаление успешно завершено! Папка проекта удалена."
+else
+  echo "✅ Удаление успешно завершено! Папка проекта сохранена."
+fi
+
 exit 0 

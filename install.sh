@@ -18,6 +18,18 @@ if [ -z "$DOMAIN_NAME" ]; then
   echo "Используем домен: $DOMAIN_NAME"
 fi
 
+# Проверка архитектуры процессора
+ARCH=$(uname -m)
+echo "Определена архитектура процессора: $ARCH"
+if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+  echo "ВНИМАНИЕ: Обнаружена ARM-архитектура. Возможно потребуются специальные образы Docker."
+  read -p "Продолжить установку? (y/n): " CONTINUE
+  if [ "$CONTINUE" != "y" ]; then
+    echo "Установка отменена"
+    exit 0
+  fi
+fi
+
 # Последовательное выполнение скриптов
 echo "Шаг 1: Обновление системы..."
 bash setup-files/01-update-system.sh
@@ -68,6 +80,17 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Проверка наличия сети Docker
+echo "Проверка сети Docker..."
+if ! sudo docker network ls | grep -q "app-network"; then
+  echo "Создание сети app-network..."
+  sudo docker network create app-network
+  if [ $? -ne 0 ]; then
+    echo "Ошибка создания сети app-network"
+    exit 1
+  fi
+fi
+
 echo "Шаг 8: Запуск сервисов..."
 bash setup-files/07-start-services.sh
 if [ $? -ne 0 ]; then
@@ -82,7 +105,16 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "✅ Установка успешно завершена!"
+# Проверка статуса контейнеров
+echo "Проверка статуса контейнеров..."
+if sudo docker ps -a | grep -q "Restarting\|Exit"; then
+  echo "⚠️ Внимание: Некоторые контейнеры могут быть в состоянии перезапуска или завершены с ошибкой."
+  echo "Проверьте логи с помощью: docker logs <имя_контейнера>"
+else
+  echo "✅ Все контейнеры запущены успешно!"
+fi
+
+echo "✅ Установка завершена!"
 echo "Доступные сервисы:"
 echo "- n8n: http://n8n.$DOMAIN_NAME"
 echo "- Flowise: http://flowise.$DOMAIN_NAME"

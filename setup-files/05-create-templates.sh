@@ -189,8 +189,24 @@ services:
     restart: unless-stopped
     ports:
       - "11235:11235"
+    environment:
+      - CHROME_PATH=/usr/bin/chromium-browser
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - MAX_CONCURRENT_TASKS=5
+    volumes:
+      - /dev/shm:/dev/shm
+      - crawl4ai_data:/app/data
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
     networks:
       - app-network
+
+volumes:
+  crawl4ai_data:
 
 networks:
   app-network:
@@ -245,8 +261,8 @@ zep.${DOMAIN_NAME} {
     reverse_proxy zep:8000
 }
 
-crawl4ai.${DOMAIN_NAME} {\
-    reverse_proxy crawl4ai:11235\
+crawl4ai.${DOMAIN_NAME} {
+    reverse_proxy crawl4ai:11235
 }
 EOL
 if [ $? -ne 0 ]; then
