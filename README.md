@@ -1,109 +1,114 @@
-# Cloud-Local n8n, Flowise & Zep Setup
+# Cloud-Local: Установка n8n, Flowise и Zep
 
-Automated installation script for n8n, Flowise, and Zep with reverse proxy server Caddy for secure access via HTTPS.
+Автоматизированный скрипт для установки n8n, Flowise и Zep с веб-сервером Caddy для безопасного доступа по HTTPS.
 
-## Description
+## Описание
 
-This repository contains scripts for automatic configuration of:
+Этот репозиторий содержит скрипты для автоматической настройки:
 
-- **n8n** - a powerful open-source workflow automation platform
-- **Flowise** - a tool for creating customizable AI flows
-- **Zep** - memory and vector database for LLM applications
-- **Caddy** - a modern web server with automatic HTTPS
+- **n8n** - мощная open-source платформа для автоматизации рабочих процессов
+- **Flowise** - инструмент для создания кастомизируемых AI-приложений
+- **Zep** - хранилище памяти и векторная база данных для LLM-приложений
+- **Caddy** - современный веб-сервер с автоматическим HTTPS
 
-The system is configured to work with your domain name and automatically obtains Let's Encrypt SSL certificates.
+Система настроена для работы с вашим доменным именем и автоматически получает SSL-сертификаты Let's Encrypt.
 
-## Requirements
+## Требования
 
-- Ubuntu 22.04 
-- Domain name pointing to your server's IP address
-- Server access with administrator rights (sudo)
-- Open ports 80, 443
-- OpenRouter API key (for Zep LLM functionality)
+- Ubuntu 22.04
+- Доменное имя, указывающее на IP-адрес вашего сервера
+- Доступ к серверу с правами администратора (sudo)
+- Открытые порты 80, 443
+- API-ключ OpenRouter (для функциональности LLM в Zep)
 
-## Installation
+## Установка
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/miolamio/cloud-local-n8n-flowise.git && cd cloud-local-n8n-flowise
-   ```
+1.  Клонируйте репозиторий:
+    ```bash
+    git clone https://github.com/PavelBelove/cloud-local-n8n-flowise.git && cd cloud-local-n8n-flowise
+    ```
 
-2. Make the script executable:
-   ```bash
-   chmod +x setup.sh
-   ```
+2.  Сделайте скрипт исполняемым:
+    ```bash
+    chmod +x setup.sh
+    ```
 
-3. Run the installation script:
-   ```bash
-   ./setup.sh
-   ```
+3.  Запустите установочный скрипт:
+    ```bash
+    ./setup.sh
+    ```
 
-4. Follow the instructions in the terminal:
-   - Enter your domain name (e.g., example.com)
-   - Enter your email (will be used for n8n login and Let's Encrypt)
-   - Enter your OpenRouter API key (for Zep to use external LLMs)
-   - Optionally, customize the OpenRouter model (default: meta-llama/llama-4-maverick:free)
+4.  Следуйте инструкциям в терминале:
+    - Введите ваше доменное имя (например, example.com)
+    - Введите ваш email (будет использоваться для входа в n8n и Let's Encrypt)
+    - Введите ваш API-ключ OpenRouter (для использования внешних LLM в Zep)
+    - Опционально, измените модель OpenRouter (по умолчанию: meta-llama/llama-4-maverick:free)
 
-## What the installation script does
+## Что делает установочный скрипт
 
-1. **System update** - updates the package list and installs necessary dependencies
-2. **Docker installation** - installs Docker Engine and Docker Compose
-3. **Directory setup** - creates n8n user and necessary directories
-4. **Secret generation** - creates random passwords and encryption keys
-5. **Configuration file creation** - generates docker-compose files and Caddyfile
-6. **Firewall setup** - opens necessary ports
-7. **Zep setup** - creates directories and sets permissions for Zep
-8. **Service launch** - starts Docker containers
+1.  **Обновление системы** - обновляет список пакетов и устанавливает необходимые зависимости
+2.  **Установка Docker** - устанавливает Docker Engine и Docker Compose
+3.  **Настройка директорий** - создает пользователя n8n и необходимые директории
+4.  **Генерация секретов** - создает случайные пароли и ключи шифрования
+5.  **Создание файлов конфигурации** - генерирует файлы docker-compose и Caddyfile
+6.  **Настройка брандмауэра** - открывает необходимые порты
+7.  **Настройка Zep** - создает директории и устанавливает разрешения для Zep
+8.  **Запуск сервисов** - запускает Docker-контейнеры
 
-## Accessing services
+## Доступ к сервисам
 
-After installation completes, you will be able to access services at the following URLs:
+После завершения установки вы сможете получить доступ к сервисам по следующим URL:
 
-- **n8n**: https://n8n.your-domain.xxx
-- **Flowise**: https://flowise.your-domain.xxx
-- **Zep API**: https://zep.your-domain.xxx
+- **n8n**: https://n8n.ваш-домен.xxx
+- **Flowise**: https://flowise.ваш-домен.xxx
+- **Zep API**: https://zep.ваш-домен.xxx
 
-Login credentials will be displayed at the end of the installation process.
+Учетные данные для входа будут отображены в конце процесса установки.
 
-## Project structure
+## Структура проекта
 
-- `setup.sh` - main installation script
-- `setup-files/` - directory with helper scripts:
-  - `01-update-system.sh` - system update
-  - `02-install-docker.sh` - Docker installation
-  - `03-setup-directories.sh` - directory and user setup
-  - `04-generate-secrets.sh` - secret key generation
-  - `05-create-templates.sh` - configuration file creation
-  - `06-setup-firewall.sh` - firewall setup
-  - `07-start-services.sh` - service launch
-  - `08-setup-zep.sh` - Zep setup
-- `n8n-docker-compose.yaml.template` - docker-compose template for n8n and Caddy
-- `flowise-docker-compose.yaml.template` - docker-compose template for Flowise
-- `zep-docker-compose.yaml.template` - docker-compose template for Zep, PostgreSQL and Qdrant
+- `setup.sh` - основной установочный скрипт
+- `setup-files/` - директория со вспомогательными скриптами:
+    - `01-update-system.sh` - обновление системы
+    - `02-install-docker.sh` - установка Docker
+    - `03-setup-directories.sh` - настройка директорий и пользователя
+    - `04-generate-secrets.sh` - генерация секретных ключей
+    - `05-create-templates.sh` - создание файлов конфигурации
+    - `06-setup-firewall.sh` - настройка брандмауэра
+    - `07-start-services.sh` - запуск сервисов
+    - `08-setup-zep.sh` - настройка Zep
+- `n8n-docker-compose.yaml.template` - шаблон docker-compose для n8n и Caddy
+- `flowise-docker-compose.yaml.template` - шаблон docker-compose для Flowise
+- `zep-docker-compose.yaml.template` - шаблон docker-compose для Zep, PostgreSQL и Qdrant
 
-## Zep Configuration
+## Конфигурация Zep
 
-Zep is configured with:
-- PostgreSQL database for memory storage
-- Qdrant vector database for embeddings storage
-- Sentence Transformers embeddings model (all-MiniLM-L6-v2)
-- OpenRouter for LLM API access
+Zep настроен с:
+- Базой данных PostgreSQL для хранения памяти
+- Векторной базой данных Qdrant для хранения эмбеддингов
+- Моделью эмбеддингов Sentence Transformers (all-MiniLM-L6-v2)
+- OpenRouter для доступа к API языковых моделей
+- Включенной аутентификацией (Admin API Key генерируется при установке)
 
-## Integrating Zep
+## Интеграция Zep
 
-### With n8n
-You can use Zep in n8n via the HTTP Request nodes:
-- Base URL: `https://zep.your-domain.xxx/api`
-- API documentation: https://docs.getzep.com/api/
+При взаимодействии с API Zep вам потребуется предоставить API-ключ. Admin API-ключ генерируется во время установки и выводится в конце. Вы можете создать дополнительные ключи через сам API (см. документацию Zep).
 
-### With Flowise
-You can integrate Zep in Flowise by creating custom tools or using memory components:
-- API Endpoint: `https://zep.your-domain.xxx/api`
-- Documentation: https://docs.getzep.com
+### С n8n
+Вы можете использовать Zep в n8n через ноды HTTP Request:
+- Базовый URL: `https://zep.ваш-домен.xxx/api`
+- Аутентификация: Используйте сгенерированный Admin API Key или создайте новый через API.
+- Документация API: https://docs.getzep.com/api/
 
-## Managing services
+### С Flowise
+Вы можете интегрировать Zep в Flowise, создавая кастомные инструменты или используя компоненты памяти:
+- API Endpoint: `https://zep.ваш-домен.xxx/api`
+- Аутентификация: Используйте сгенерированный Admin API Key или создайте новый через API.
+- Документация: https://docs.getzep.com
 
-### Restarting services
+## Управление сервисами
+
+### Перезапуск сервисов
 
 ```bash
 docker compose -f n8n-docker-compose.yaml restart
@@ -111,7 +116,7 @@ docker compose -f flowise-docker-compose.yaml restart
 docker compose -f zep-docker-compose.yaml restart
 ```
 
-### Stopping services
+### Остановка сервисов
 
 ```bash
 docker compose -f n8n-docker-compose.yaml down
@@ -119,7 +124,7 @@ docker compose -f flowise-docker-compose.yaml down
 docker compose -f zep-docker-compose.yaml down
 ```
 
-### Viewing logs
+### Просмотр логов
 
 ```bash
 docker compose -f n8n-docker-compose.yaml logs
@@ -127,24 +132,21 @@ docker compose -f flowise-docker-compose.yaml logs
 docker compose -f zep-docker-compose.yaml logs
 ```
 
-## Security
+## Безопасность
 
-- All services are accessible only via HTTPS with automatically renewed Let's Encrypt certificates
-- Random passwords are created for n8n, Flowise, and PostgreSQL
-- Users are created with minimal necessary privileges
-- API keys are stored securely in environment variables
+- Все сервисы доступны только по HTTPS с автоматически обновляемыми сертификатами Let's Encrypt
+- Случайные пароли создаются для n8n, Flowise и PostgreSQL
+- Пользователи создаются с минимальными необходимыми привилегиями
+- API-ключи (OpenRouter, Zep Admin) надежно хранятся в переменных окружения
 
-## Troubleshooting
+## Устранение неполадок
 
-- Check your domain's DNS records to ensure they point to the correct IP address
-- Verify that ports 80 and 443 are open on your server
-- View container logs to detect errors
-- For Zep-specific issues, check the Zep logs: `docker compose -f zep-docker-compose.yaml logs zep`
+- Проверьте DNS-записи вашего домена, чтобы убедиться, что они указывают на правильный IP-адрес
+- Убедитесь, что порты 80 и 443 открыты на вашем сервере
+- Просмотрите логи контейнеров для выявления ошибок
 
-## License
 
-This project is distributed under the MIT License.
 
-## Author
+## Автор
 
-@codegeek
+@pavelbelove

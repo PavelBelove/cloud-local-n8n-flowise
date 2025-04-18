@@ -7,13 +7,19 @@ if command -v ufw &> /dev/null; then
   echo "UFW is already installed, opening required ports..."
   
   # Open ports
-  sudo ufw allow 80
+  sudo ufw allow 22/tcp # Allow SSH access
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to open port 22 (SSH)"
+    exit 1
+  fi
+
+  sudo ufw allow 80/tcp # Allow HTTP access
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to open port 80"
     exit 1
   fi
   
-  sudo ufw allow 443
+  sudo ufw allow 443/tcp # Allow HTTPS access
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to open port 443"
     exit 1
@@ -30,7 +36,7 @@ if command -v ufw &> /dev/null; then
     fi
   fi
   
-  echo "Ports 80 and 443 are open in the firewall"
+  echo "Ports 22, 80 and 443 are open in the firewall"
 else
   echo "UFW is not installed. Installing..."
   sudo apt-get install -y ufw
@@ -40,13 +46,19 @@ else
   fi
   
   # Open ports
-  sudo ufw allow 80
+  sudo ufw allow 22/tcp # Allow SSH access
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to open port 22 (SSH)"
+    exit 1
+  fi
+  
+  sudo ufw allow 80/tcp # Allow HTTP access
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to open port 80"
     exit 1
   fi
   
-  sudo ufw allow 443
+  sudo ufw allow 443/tcp # Allow HTTPS access
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to open port 443"
     exit 1
@@ -59,7 +71,7 @@ else
     exit 1
   fi
   
-  echo "Firewall installed and ports 80, 443 are open"
+  echo "Firewall installed and ports 22, 80, 443 are open"
 fi
 
 echo "✅ Firewall successfully configured"

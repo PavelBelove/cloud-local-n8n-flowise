@@ -105,6 +105,7 @@ main() {
   N8N_PASSWORD=""
   FLOWISE_PASSWORD=""
   ZEP_POSTGRES_PASSWORD=""
+  ZEP_ADMIN_API_KEY=""
   if [ -f "./setup-files/passwords.txt" ]; then
     source ./setup-files/passwords.txt
   fi
@@ -125,6 +126,7 @@ main() {
   echo "Password: ${FLOWISE_PASSWORD:-<check the .env file>}"
   echo ""
   echo "Zep API Endpoint: https://zep.${DOMAIN_NAME}/api"
+  echo "Zep Admin API Key: ${ZEP_ADMIN_API_KEY:-<check the .env file>}"
   echo "PostgreSQL Password for Zep: ${ZEP_POSTGRES_PASSWORD:-<check the .env file>}"
   echo ""
   echo "Please note that for the domain name to work, you need to configure DNS records"

@@ -114,13 +114,23 @@ services:
     container_name: zep
     restart: unless-stopped
     environment:
-      - ZEP_STORE_TYPE=postgres
+      # Store configuration
+      - ZEP_STORE_TYPE=postgres # Use postgres for memory and metadata
+      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://\${ZEP_POSTGRES_USER}:\${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/\${ZEP_POSTGRES_DB}?sslmode=disable
+      - ZEP_DOCUMENT_STORE_TYPE=qdrant # Use qdrant for document embeddings
+      - ZEP_QDRANT_URL=http://qdrant:6333
+
+      # LLM configuration (using OpenRouter)
       - ZEP_OPENAI_API_KEY=\${OPENROUTER_API_KEY}
       - ZEP_OPENAI_API_BASE=https://openrouter.ai/api/v1
-      - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - ZEP_OPENAI_CHAT_MODEL=\${OPENROUTER_MODEL}
-      - ZEP_MEMORY_STORE_POSTGRES_DSN=postgres://\${ZEP_POSTGRES_USER}:\${ZEP_POSTGRES_PASSWORD}@zep-postgres:5432/\${ZEP_POSTGRES_DB}?sslmode=disable
-      - ZEP_QDRANT_URL=http://qdrant:6333
+
+      # Embeddings configuration (using built-in Sentence Transformers)
+      - ZEP_OPENAI_EMBEDDINGS_MODEL=sentence-transformers/all-MiniLM-L6-v2
+
+      # Authentication
+      - ZEP_AUTH_REQUIRED=true
+      - ZEP_ADMIN_API_KEY=\${ZEP_ADMIN_API_KEY}
     mem_limit: 512m
     cpus: 0.5
     volumes:

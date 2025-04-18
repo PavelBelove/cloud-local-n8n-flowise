@@ -64,6 +64,13 @@ if [ -z "$ZEP_POSTGRES_PASSWORD" ]; then
 fi
 ZEP_POSTGRES_DB="zep"
 
+# Generate Zep Admin API Key
+ZEP_ADMIN_API_KEY=$(generate_random_string 40)
+if [ -z "$ZEP_ADMIN_API_KEY" ]; then
+  echo "ERROR: Failed to generate admin API key for Zep"
+  exit 1
+fi
+
 # Request OpenRouter API key
 read -p "Enter your OpenRouter API key: " OPENROUTER_API_KEY
 while [[ -z "$OPENROUTER_API_KEY" ]]; do
@@ -105,6 +112,9 @@ ZEP_POSTGRES_DB=$ZEP_POSTGRES_DB
 # OpenRouter settings
 OPENROUTER_API_KEY=$OPENROUTER_API_KEY
 OPENROUTER_MODEL=$OPENROUTER_MODEL
+
+# Zep Admin API Key
+ZEP_ADMIN_API_KEY=$ZEP_ADMIN_API_KEY
 EOL
 
 if [ $? -ne 0 ]; then
@@ -116,11 +126,13 @@ echo "Secret keys generated and saved to .env file"
 echo "Password for n8n: $N8N_PASSWORD"
 echo "Password for Flowise: $FLOWISE_PASSWORD"
 echo "Password for Zep PostgreSQL: $ZEP_POSTGRES_PASSWORD"
+echo "Admin API Key for Zep: $ZEP_ADMIN_API_KEY"
 
 # Save passwords for future use - using quotes to properly handle special characters
-echo "N8N_PASSWORD=\"$N8N_PASSWORD\"" > ./setup-files/passwords.txt
-echo "FLOWISE_PASSWORD=\"$FLOWISE_PASSWORD\"" >> ./setup-files/passwords.txt
-echo "ZEP_POSTGRES_PASSWORD=\"$ZEP_POSTGRES_PASSWORD\"" >> ./setup-files/passwords.txt
+echo "N8N_PASSWORD=\\"$N8N_PASSWORD\\"" > ./setup-files/passwords.txt
+echo "FLOWISE_PASSWORD=\\"$FLOWISE_PASSWORD\\"" >> ./setup-files/passwords.txt
+echo "ZEP_POSTGRES_PASSWORD=\\"$ZEP_POSTGRES_PASSWORD\\"" >> ./setup-files/passwords.txt
+echo "ZEP_ADMIN_API_KEY=\\"$ZEP_ADMIN_API_KEY\\"" >> ./setup-files/passwords.txt
 
 echo "✅ Secret keys and passwords successfully generated"
 exit 0 
