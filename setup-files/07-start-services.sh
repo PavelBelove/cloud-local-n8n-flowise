@@ -28,14 +28,6 @@ if [ ! -f ".env" ]; then
   exit 1
 fi
 
-# Build crawl4ai image first (might take time)
-echo "Building crawl4ai image (this may take several minutes)..."
-sudo docker compose -f crawl4ai-docker-compose.yaml build
-if [ $? -ne 0 ]; then
-  echo "ERROR: Failed to build crawl4ai image"
-  exit 1
-fi
-
 # Start n8n and Caddy
 echo "Starting n8n and Caddy..."
 sudo docker compose -f n8n-docker-compose.yaml up -d
@@ -70,11 +62,11 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Start crawl4ai
-echo "Starting crawl4ai service..."
+# Start Crawl4AI
+echo "Starting Crawl4AI service..."
 sudo docker compose -f crawl4ai-docker-compose.yaml up -d
 if [ $? -ne 0 ]; then
-  echo "ERROR: Failed to start crawl4ai service"
+  echo "ERROR: Failed to start Crawl4AI service"
   exit 1
 fi
 
@@ -117,5 +109,5 @@ if ! sudo docker ps | grep -q "crawl4ai"; then
   exit 1
 fi
 
-echo "✅ Services n8n, Flowise, Zep, crawl4ai and Caddy successfully started"
+echo "✅ Services n8n, Flowise, Zep, Crawl4AI and Caddy successfully started"
 exit 0 

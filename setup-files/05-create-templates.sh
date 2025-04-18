@@ -113,10 +113,6 @@ services:
     image: ghcr.io/getzep/zep:latest
     container_name: zep
     restart: unless-stopped
-    env_file:
-      - .env # Explicitly load variables from the .env file
-    # We keep the environment section for potentially overriding .env values or for clarity,
-    # but env_file often takes precedence. Zep might read this now.
     environment:
       # Store configuration
       - ZEP_STORE_TYPE=postgres # Use postgres for memory and metadata
@@ -180,32 +176,21 @@ else
   echo "Template zep-docker-compose.yaml.template already exists"
 fi
 
-# Create crawl4ai template if it doesn't exist
+# Create Crawl4AI template if it doesn't exist
 if [ ! -f "crawl4ai-docker-compose.yaml.template" ]; then
   echo "Creating template crawl4ai-docker-compose.yaml.template..."
   cat > crawl4ai-docker-compose.yaml.template << EOL
 version: '3'
 
-volumes:
-  crawl4ai_cache:
-    driver: local
-
 services:
   crawl4ai:
-    build:
-      context: ./crawl4ai-docker
+    image: unclecode/crawl4ai:basic
     container_name: crawl4ai
     restart: unless-stopped
-    volumes:
-      - crawl4ai_cache:/app/cache # Mount the cache volume
+    ports:
+      - "11235:11235"
     networks:
       - app-network
-    # Expose port 8001 internally for Caddy
-    expose:
-      - 8001
-    # Resource limits (adjust as needed)
-    mem_limit: 512m
-    cpus: 0.5
 
 networks:
   app-network:
@@ -238,6 +223,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Copy Crawl4AI template to working file
 cp crawl4ai-docker-compose.yaml.template crawl4ai-docker-compose.yaml
 if [ $? -ne 0 ]; then
   echo "ERROR: Failed to copy crawl4ai-docker-compose.yaml.template to working file"
@@ -259,8 +245,8 @@ zep.${DOMAIN_NAME} {
     reverse_proxy zep:8000
 }
 
-crawl4ai.${DOMAIN_NAME} {
-    reverse_proxy crawl4ai:8001
+crawl4ai.${DOMAIN_NAME} {\
+    reverse_proxy crawl4ai:11235\
 }
 EOL
 if [ $? -ne 0 ]; then

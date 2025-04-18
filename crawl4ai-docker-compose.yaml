@@ -7,8 +7,16 @@ services:
     restart: unless-stopped
     ports:
       - "11235:11235"
+    volumes:
+      - crawl4ai_data:/app/data
+    environment:
+      - CHROME_PATH=/usr/bin/chromium-browser
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
     networks:
       - app-network
+
+volumes:
+  crawl4ai_data:
 
 networks:
   app-network:

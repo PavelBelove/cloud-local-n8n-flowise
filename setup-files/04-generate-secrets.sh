@@ -64,8 +64,8 @@ if [ -z "$ZEP_POSTGRES_PASSWORD" ]; then
 fi
 ZEP_POSTGRES_DB="zep"
 
-# Generate Zep Admin API Key (use safe password function)
-ZEP_ADMIN_API_KEY=$(generate_safe_password 40)
+# Generate Zep Admin API Key
+ZEP_ADMIN_API_KEY=$(generate_random_string 40)
 if [ -z "$ZEP_ADMIN_API_KEY" ]; then
   echo "ERROR: Failed to generate admin API key for Zep"
   exit 1
@@ -131,8 +131,8 @@ echo "Admin API Key for Zep: $ZEP_ADMIN_API_KEY"
 # Save passwords for future use - using quotes to properly handle special characters
 echo "N8N_PASSWORD=\\"$N8N_PASSWORD\\"" > ./setup-files/passwords.txt
 echo "FLOWISE_PASSWORD=\\"$FLOWISE_PASSWORD\\"" >> ./setup-files/passwords.txt
-echo "ZEP_POSTGRES_PASSWORD=\"$ZEP_POSTGRES_PASSWORD\"" >> ./setup-files/passwords.txt
-echo "ZEP_ADMIN_API_KEY=\"$ZEP_ADMIN_API_KEY\"" >> ./setup-files/passwords.txt
+echo "ZEP_POSTGRES_PASSWORD=\\"$ZEP_POSTGRES_PASSWORD\\"" >> ./setup-files/passwords.txt
+echo "ZEP_ADMIN_API_KEY=\\"$ZEP_ADMIN_API_KEY\\"" >> ./setup-files/passwords.txt
 
 echo "✅ Secret keys and passwords successfully generated"
 exit 0 
